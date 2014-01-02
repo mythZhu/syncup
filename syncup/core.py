@@ -49,17 +49,33 @@ def get_distribution(**attrs):
 
 
 def syncup(dist, target, **options):
-    output = dist.run_command('freeze', **options)
+    freeze_opts = {}
+    freeze_opts['root'] = options.pop('dist_root', None)
+    freeze_opts['lib_paths'] = options.pop('lib_search_paths', None)
+    freeze_opts['data_paths'] = options.pop('data_search_paths', None)
+    freeze_opts['script_paths'] = options.pop('script_search_paths', None)
+
+    others_opts = {}
+    others_opts['target'] = target
+    others_opts['nopyc'] = options.pop('nopyc', None)
+    others_opts['lib_prefix'] = options.pop('lib_store_prefix', None)
+    others_opts['data_prefix'] = options.pop('data_store_prefix', None)
+    others_opts['script_prefix'] = options.pop('script_store_prefix', None)
+
+    for key in options.iterkeys():
+        raise TypeError, 'syncup() got an unexpected keyword argument %s' % key
+
+    output = dist.run_command('freeze', **freeze_opts)
 
     if DEBUG:
         print >> sys.stdout, 'D: freeze %s distribution files' % len(output)
-        for out in output:
-            print >> sys.stdout, 'D: include %s' % out
+        for name, path in output:
+            print >> sys.stdout, 'D: include %s' % path
 
     if target.lower().endswith('.zip'):
-        dist.run_command('zip', target=target, nopyc=True)
+        dist.run_command('zip', **others_opts)
     else:
-        dist.run_command('clone', target_dir=target, nopyc=True)
+        dist.run_command('clone', **others_opts)
 
     if DEBUG:
         print >> sys.stdout, 'D: clone distribution to %s' % target

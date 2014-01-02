@@ -4,36 +4,78 @@ import os
 import tempfile
 
 from syncup.cmd import Command
-from syncup.util import change_root, copy_file_or_dir, remove_file_or_dir
+from syncup.util import walk_tree, change_root
+from syncup.util import copy_file_or_dir, remove_file_or_dir
 from syncup.errors import CommandError
 
 
 class clone(Command):
 
     def init_options(self):
-        self.target_dir = None
-        self.dist_files = None
-        self.nopyc = False
+        self.target = None
+        self.lib_prefix = None
+        self.data_prefix = None
+        self.script_prefix = None
+        self.nopyc = True
+
+    def clone_lib(self):
+        cached_lib = self.distribution.dist_cache.get('freeze_lib')
+        if cached_lib is None:
+            raise CommandError, 'please run freeze_lib command before.'
+
+        for name, path in cached_lib:
+            dst_pre = self.lib_prefix
+            if dst_pre is None:
+                dst_pre = os.path.dirname(path)
+
+            dst_pth = os.path.join(dst_pre, name)
+            dst_pth = change_root(self.target, dst_pth)
+
+            # TODO: nopyc
+
+            copy_file_or_dir(path, dst_pth, force=True)
+
+    def clone_data(self):
+        cached_dat = self.distribution.dist_cache.get('freeze_data')
+        if cached_dat is None:
+            raise CommandError, 'please run freeze_data command before.'
+
+        for name, path in cached_dat:
+            dst_pre = self.data_prefix
+            if dst_pre is None:
+                dst_pre = os.path.dirname(path)
+
+            dst_pth = os.path.join(dst_pre, name)
+            dst_pth = change_root(self.target, dst_pth)
+
+            copy_file_or_dir(path, dst_pth, force=True)
+
+    def clone_script(self):
+        cached_bin = self.distribution.dist_cache.get('freeze_script')
+        if cached_bin is None:
+            raise CommandError, 'please run freeze_script command before.'
+
+        for name, path in cached_bin:
+            dst_pre = self.script_prefix
+            if dst_pre is None:
+                dst_pre = os.path.dirname(path)
+
+            dst_pth = os.path.join(dst_pre, name)
+            dst_pth = change_root(self.target, dst_pth)
+
+            copy_file_or_dir(path, dst_pth, force=False)
+            os.chmod(dst_pth, 0777)
 
     def main(self):
-        if self.dist_files is None:
-            cached = self.distribution.dist_cache.get('freeze')
-            if cached is None:
-                raise CommandError, 'please run freeze command before.'
-            else:
-                self.dist_files = cached
+        if self.target is None:
+            self.target = tempfile.mktemp()
 
-        if self.target_dir is None:
-            self.target_dir = tempfile.mktemp()
+        if os.path.exists(self.target):
+            remove_file_or_dir(self.target)
+        os.makedirs(self.target)
 
-        if os.path.exists(self.target_dir):
-            remove_file_or_dir(self.target_dir)
-        os.makedirs(self.target_dir)
+        self.clone_lib()
+        self.clone_data()
+        self.clone_script()
 
-        for f in filter(os.path.isfile, self.dist_files):
-            if self.nopyc and f.endswith(('.pyc', '.pyo')):
-                continue
-            copy_file = change_root(self.target_dir, f)
-            copy_file_or_dir(f, copy_file, force=True)
-
-        return self.target_dir
+        return self.target

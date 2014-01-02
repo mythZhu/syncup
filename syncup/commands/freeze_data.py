@@ -5,7 +5,7 @@ import sys
 import site
 
 from syncup.cmd import Command
-from syncup.util import walk_tree, change_root, get_home_path
+from syncup.util import change_root, get_home_path
 from syncup.errors import CommandError
 
 
@@ -42,12 +42,5 @@ class freeze_data(Command):
     def main(self):
         data_files = []
         for data_file in self.distribution.data_files:
-            fname, fpath = self.find_data(data_file)
-            data_files.append(fpath)
-
-        output = []
-        for data in data_files:
-            if data in output:
-                continue
-            output.extend(walk_tree(data))
-        return output
+            data_files.append(self.find_data(data_file))
+        return data_files

@@ -4,7 +4,7 @@ import os
 import sys
 
 from syncup.cmd import Command
-from syncup.util import walk_tree, change_root
+from syncup.util import change_root
 from syncup.errors import CommandError
 
 
@@ -45,19 +45,14 @@ class freeze_lib(Command):
     def main(self):
         modules = []
         for mod in self.distribution.py_modules:
-            fname, fpath = self.find_module(mod)
-            modules.append(fpath)
+            modules.append(self.find_module(mod))
 
         packages = []
         for pkg in self.distribution.packages:
-            fname, fpath = self.find_package(pkg)
-            packages.append(fpath)
+            packages.append(self.find_package(pkg))
 
         output = []
         output.extend(modules)
-        for pkg in packages:
-            if pkg in output:
-                continue
-            output.extend(walk_tree(pkg))
+        output.extend(packages)
 
         return output

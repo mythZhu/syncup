@@ -47,6 +47,5 @@ class freeze_script(Command):
     def main(self):
         scripts = []
         for script in self.distribution.scripts:
-            fname, fpath = self.find_script(script)
-            scripts.append(fpath)
+            scripts.append(self.find_script(script))
         return scripts

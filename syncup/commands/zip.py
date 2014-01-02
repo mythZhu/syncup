@@ -5,7 +5,7 @@ import zipfile
 import tempfile
 
 from syncup.cmd import Command
-from syncup.util import remove_file_or_dir
+from syncup.util import walk_tree, remove_file_or_dir
 from syncup.errors import CommandError
 
 
@@ -13,17 +13,12 @@ class zip(Command):
 
     def init_options(self):
         self.target = None
-        self.dist_files = None
-        self.nopyc = False
+        self.lib_prefix = None
+        self.data_prefix = None
+        self.script_prefix = None
+        self.nopyc = True
 
     def main(self):
-        if self.dist_files is None:
-            cached = self.distribution.dist_cache.get('freeze')
-            if cached is None:
-                raise CommandError, 'please run freeze command before.'
-            else:
-                self.dist_files = cached
-
         if self.target is None:
             self.target = tempfile.mktemp()
 
@@ -34,11 +29,18 @@ class zip(Command):
         if not os.path.exists(target_dir):
             os.makedirs(target_dir)
 
+        clone = self.run_command(
+                    'clone',
+                    lib_prefix=self.lib_prefix,
+                    data_prefix=self.data_prefix,
+                    script_prefix=self.script_prefix,
+                    nopyc=self.nopyc)
+
         zip = zipfile.ZipFile(self.target, 'w')
-        for f in filter(os.path.isfile, self.dist_files):
-            if self.nopyc and f.endswith(('.pyc', '.pyo')):
+        for f in walk_tree(clone):
+            if os.path.isdir(f):
                 continue
-            zip.write(f)
+            zip.write(f, os.path.relpath(f, clone))
         zip.close()
 
         return self.target
