@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import glob
 import shutil
 
 from distutils.util import change_root
@@ -34,7 +35,8 @@ def remove_file_or_dir(file_or_dir):
     return os.path.exists(file_or_dir)
 
 
-def copy_file_or_dir(file_or_dir, dest_path, force=False):
+def copy_file_or_dir(file_or_dir, dest_path, force=False,
+                     symlinks=False,ignores=()):
     """ Copy a file node whatever its type.
     """
     if os.path.exists(dest_path):
@@ -48,9 +50,12 @@ def copy_file_or_dir(file_or_dir, dest_path, force=False):
         os.makedirs(dest_dir)
 
     if os.path.isdir(file_or_dir):
-        shutil.copytree(file_or_dir, dest_path)
+        ignores = shutil.ignore_patterns(*ignores)
+        shutil.copytree(file_or_dir, dest_path, symlinks, ignores)
+
     else:
-        shutil.copyfile(file_or_dir, dest_path)
+        if True not in map(file_or_dir.lower().endswith, ignores):
+            shutil.copyfile(file_or_dir, dest_path)
 
     return os.path.exists(dest_path)
 

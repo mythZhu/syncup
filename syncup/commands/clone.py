@@ -23,48 +23,37 @@ class clone(Command):
         if cached_lib is None:
             raise CommandError, 'please run freeze_lib command before.'
 
-        for name, path in cached_lib:
-            dst_pre = self.lib_prefix
-            if dst_pre is None:
-                dst_pre = os.path.dirname(path)
+        for (name, full, root, prefix) in cached_lib:
+            dst_prefix = self.lib_prefix or prefix
+            dst_full = os.path.join(dst_prefix, name)
+            dst_full = change_root(self.target, dst_full)
 
-            dst_pth = os.path.join(dst_pre, name)
-            dst_pth = change_root(self.target, dst_pth)
-
-            # TODO: nopyc
-
-            copy_file_or_dir(path, dst_pth, force=True)
+            copy_file_or_dir(full, dst_full, ignores=('*.pyc', '*.pyo'))
 
     def clone_data(self):
         cached_dat = self.distribution.dist_cache.get('freeze_data')
         if cached_dat is None:
             raise CommandError, 'please run freeze_data command before.'
 
-        for name, path in cached_dat:
-            dst_pre = self.data_prefix
-            if dst_pre is None:
-                dst_pre = os.path.dirname(path)
+        for (name, full, root, prefix) in cached_dat:
+            dst_prefix = self.data_prefix or prefix
+            dst_full = os.path.join(dst_prefix, name)
+            dst_full = change_root(self.target, dst_full)
 
-            dst_pth = os.path.join(dst_pre, name)
-            dst_pth = change_root(self.target, dst_pth)
-
-            copy_file_or_dir(path, dst_pth, force=True)
+            copy_file_or_dir(full, dst_full)
 
     def clone_script(self):
         cached_bin = self.distribution.dist_cache.get('freeze_script')
         if cached_bin is None:
             raise CommandError, 'please run freeze_script command before.'
 
-        for name, path in cached_bin:
-            dst_pre = self.script_prefix
-            if dst_pre is None:
-                dst_pre = os.path.dirname(path)
+        for (name, full, root, prefix) in cached_bin:
+            dst_prefix = self.script_prefix or prefix
+            dst_full = os.path.join(dst_prefix, name)
+            dst_full = change_root(self.target, dst_full)
 
-            dst_pth = os.path.join(dst_pre, name)
-            dst_pth = change_root(self.target, dst_pth)
-
-            copy_file_or_dir(path, dst_pth, force=False)
-            os.chmod(dst_pth, 0777)
+            copy_file_or_dir(full, dst_full)
+            os.chmod(dst_full, 0777)
 
     def main(self):
         if self.target is None:

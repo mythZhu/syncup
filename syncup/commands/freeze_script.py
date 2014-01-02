@@ -13,7 +13,7 @@ class freeze_script(Command):
 
     def init_options(self):
         self.paths = None
-        self.root = None
+        self.root = '/'
 
     def bin_paths(self):
         if self.paths:
@@ -30,17 +30,14 @@ class freeze_script(Command):
             select_paths.append(os.path.join(sys.prefix, 'local/sbin'))
             select_paths.append(os.path.join(get_home_path(), 'bin'))
             select_paths.append(os.path.join(site.USER_BASE, 'bin'))
-
-        if self.root:
-            select_paths = [ change_root(self.root, p) for p in select_paths ]
-
         return select_paths
 
     def find_script(self, script):
-        for path in self.bin_paths():
+        for prefix in self.bin_paths():
+            path = change_root(self.root, prefix)
             full = os.path.join(path, script)
             if os.path.isfile(full):
-                return script, full
+                return (script, full, self.root, prefix)
         else:
             raise CommandError, 'No script with the name %s found' % script
 

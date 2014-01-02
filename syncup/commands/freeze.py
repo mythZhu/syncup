@@ -9,7 +9,7 @@ class freeze(Command):
         self.lib_paths = None
         self.data_paths = None
         self.script_paths = None
-        self.root = None
+        self.root = '/'
 
     def main(self):
         lib = self.run_command(

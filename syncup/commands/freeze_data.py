@@ -13,7 +13,7 @@ class freeze_data(Command):
 
     def init_options(self):
         self.paths = None
-        self.root = None
+        self.root = '/'
 
     def dat_paths(self):
         if self.paths:
@@ -25,17 +25,14 @@ class freeze_data(Command):
             select_paths.append(os.path.join(sys.prefix, 'local'))
             select_paths.append(get_home_path())
             select_paths.append(site.USER_BASE)
-
-        if self.root:
-            select_paths = [ change_root(self.root, p) for p in select_paths ]
-
         return select_paths
 
     def find_data(self, data):
-        for path in self.dat_paths():
+        for prefix in self.dat_paths():
+            path = change_root(self.root, prefix)
             full = os.path.join(path, data)
             if os.path.exists(full):
-                return data, full
+                return (data, full, self.root, prefix)
         else:
             raise CommandError, 'No data with the name %s found' % data
 
