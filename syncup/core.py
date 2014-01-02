@@ -56,9 +56,12 @@ def syncup(dist, target, **options):
         for out in output:
             print >> sys.stdout, 'D: include %s' % out
 
-    dist.run_command('clone', target_dir=target, nopyc=True)
+    if target.lower().endswith('.zip'):
+        dist.run_command('zip', target=target, nopyc=True)
+    else:
+        dist.run_command('clone', target_dir=target, nopyc=True)
 
     if DEBUG:
         print >> sys.stdout, 'D: clone distribution to %s' % target
 
-    return os.path.isdir(target)
+    return os.path.exists(target)
