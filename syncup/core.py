@@ -41,8 +41,6 @@ def get_distribution(**attrs):
     meta.do_update(attrs)
 
     if DEBUG:
-        print >> sys.stdout, 'D: load metadata %s' % meta._path
-        print >> sys.stdout, 'D: dump distribution metadata'
         print >> sys.stdout, meta
 
     return Distribution(meta)
@@ -77,17 +75,9 @@ def syncup(dist, target, **options):
 
     output = dist.freeze(**freeze_opts)
 
-    if DEBUG:
-        print >> sys.stdout, 'D: freeze %s distribution files' % len(output)
-        for (name, full, root, prefix) in output:
-            print >> sys.stdout, 'D: include %s' % full
-
     if target and target.lower().endswith('.zip'):
         dist.zip(**others_opts)
     else:
         dist.clone(**others_opts)
-
-    if DEBUG:
-        print >> sys.stdout, 'D: clone distribution to %s' % target
 
     return os.path.exists(target)

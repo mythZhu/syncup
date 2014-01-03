@@ -22,17 +22,27 @@ class DistributionMetadata(object):
         self.scripts = []
         self.data_files = []
 
+        self._path = 'DEFAULT'
         if path is not None:
             self.do_import(path)
 
     def __repr__(self):
+        header = 'Distribution meta-data:'
+        indent = '  '
+
         lines = []
+        lines.append(header)
+        lines.append(indent + '[metapath]')
+        lines.append(indent*2 + self._path)
+
         for (key, val) in self.iteritems():
-            if isinstance(val, list) or\
-               isinstance(val, tuple):
-                val = '\n  '.join(val)
-            line = '[%s]\n  %s' % (key, val)
-            lines.append(line)
+            lines.append(indent + '[%s]' % key)
+            if isinstance(val, (list, tuple)):
+                val = '\n'.join([ indent*2 + e for e in val ])
+            else:
+                val = indent*2 + val
+            lines.append(val)
+
         return '\n'.join(lines)
 
     def iteritems(self):

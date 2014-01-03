@@ -48,8 +48,7 @@ class Distribution(object):
         try:
             return self.get_command_obj(name).run
         except:
-            raise AttributeError, \
-                  "'%s' object has no attribute '%s'" % (self.__class__, name)
+            raise AttributeError, name
 
     def get_command_obj(self, command):
         from syncup import commands
@@ -65,4 +64,5 @@ class Distribution(object):
 
     def run_command(self, command, **options):
         cmd_obj = self.get_command_obj(command)
-        return cmd_obj.run(**options)
+        cmd_obj.run(**options)
+        return cmd_obj.output
