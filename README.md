@@ -76,16 +76,17 @@ freeze(
 
 # syncup() is a more powerful function
 # you can copy a python distribuiton into a directory
-syncup(dist=dist)
-syncup(meta=meta)
-syncup(path=path)
-syncup(name=name, version=version)
+syncup(dist=dist, target=target)
+syncup(meta=meta, target=target)
+syncup(path=path, target=target)
+syncup(name=name, version=version, target)
 
 
 # more, you can specify paths prefix for syncup()
 # it will store dist files with them
 syncup(
     dist=dist,
+    target=target,
     lib_prefix=your_lib_prefix,
     data_prefix=your_data_prefix,
     script_prefix=your_script_prefix,
