@@ -21,19 +21,20 @@ class freeze_script(Command):
         else:
             select_paths = []
             # TODO: more availabe search paths
+            # NOTE: the order is important
             select_paths.extend(get_os_paths())
-            select_paths.append('/bin')
-            select_paths.append('/sbin')
-            select_paths.append('/usr/bin')
-            select_paths.append('/usr/sbin')
-            select_paths.append('/usr/local/bin')
-            select_paths.append('/usr/local/sbin')
             select_paths.append(os.path.join(sys.prefix, 'bin'))
             select_paths.append(os.path.join(sys.prefix, 'sbin'))
             select_paths.append(os.path.join(sys.prefix, 'local/bin'))
             select_paths.append(os.path.join(sys.prefix, 'local/sbin'))
             select_paths.append(os.path.join(get_home_path(), 'bin'))
             select_paths.append(os.path.join(site.USER_BASE, 'bin'))
+            select_paths.append('/usr/local/bin')
+            select_paths.append('/usr/local/sbin')
+            select_paths.append('/usr/bin')
+            select_paths.append('/usr/sbin')
+            select_paths.append('/bin')
+            select_paths.append('/sbin')
         return select_paths
 
     def find_script(self, script):
