@@ -21,6 +21,9 @@ class freeze_data(Command):
         else:
             select_paths = []
             # TODO: more availabe search paths
+            select_paths.append('/')
+            select_paths.append('/usr')
+            select_paths.append('/usr/local')
             select_paths.append(sys.prefix)
             select_paths.append(os.path.join(sys.prefix, 'local'))
             select_paths.append(get_home_path())
