@@ -6,6 +6,20 @@ import sys
 from syncup.dist import Distribution
 from syncup.meta import DistributionMetadata
 
+
+__all__ = [
+    'Distribution',
+    'DistribuitonMetadata',
+    'get_meta_from_path',
+    'get_meta_from_name',
+    'get_dist_from_meta',
+    'get_dist_from_path',
+    'get_dist_from_name',
+    'freeze',
+    'syncup',
+    ]
+
+
 def get_meta_from_path(path):
     return DistributionMetadata(path)
 
