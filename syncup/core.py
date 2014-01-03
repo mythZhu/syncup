@@ -5,79 +5,86 @@ import sys
 
 from syncup.dist import Distribution
 from syncup.meta import DistributionMetadata
-from syncup.debug import DEBUG
+
+def get_meta_from_path(path):
+    return DistributionMetadata(path)
 
 
-def get_metadata(**attrs):
-    fpath = attrs.get('path')
-    if fpath:
-        return DistributionMetadata(fpath)
-
-    name = attrs.get('name')
-    version = attrs.get('version')
+def get_meta_from_name(name, version):
+    path = None
 
     if name and version:
         from syncup import metadata
         fsite = os.path.dirname(metadata.__file__)
         fname = '%s-%s.py' % (name, version)
         fpath = os.path.join(fsite, fname)
-        if not os.path.exists(fpath):
-            fpath = None
-        return DistributionMetadata(fpath)
-    else:
-        return DistributionMetadata()
+        if os.path.exists(fpath):
+            path = fpath
+
+    return get_meta_from_path(path)
 
 
-def get_distribution(**attrs):
-    meta = attrs.get('metadata')
-    if meta:
-        del attrs['metadata']
-    else:
-        path = attrs.pop('metapath', None)
-        name = attrs.pop('name', None)
-        version = attrs.pop('version', None)
-        meta = get_metadata(path=path, name=name, version=version)
-
-    meta.do_update(attrs)
-
-    if DEBUG:
-        print >> sys.stdout, meta
+def get_dist_from_meta(meta):
+    if not isinstance(meta, DistributionMetadata):
+        raise TypeError, 'meta is not instance of DistributionMetadata'
 
     return Distribution(meta)
 
 
-def syncup(dist, target, **options):
-    freeze_keys = (
-        'root',
-        'lib_paths',
-        'data_paths',
-        'script_paths'
-        )
-    others_keys = (
-        'target',
-        'nopyc',
-        'lib_prefix',
-        'data_prefix',
-        'script_prefix'
-        )
+def get_dist_from_path(path):
+    meta = get_meta_from_path(path)
+    return get_dist_from_meta(meta)
 
-    freeze_opts = {}
-    others_opts = {'target': target}
 
-    for key, val in options.iteritems():
-        if key in freeze_keys:
-            freeze_opts[key] = options[key]
-        elif key in others_keys:
-            others_opts[key] = options[key]
+def get_dist_from_name(name, version):
+    meta = get_meta_from_name(name, version)
+    return get_dist_from_meta(meta)
+
+
+def freeze(**options):
+    dist = options.pop('dist', None)
+    if dist is None:
+        meta = options.pop('meta', None)
+        path = options.pop('path', None)
+        name = options.pop('name', None)
+        version = options.pop('version', None)
+        if meta:
+            dist = get_dist_from_meta(meta)
+        elif path:
+            dist = get_dist_from_path(path)
         else:
-            raise TypeError, \
-                  'syncup() got an unexpected keyword argument %s' % key
+            dist = get_dist_from_name(name, version)
 
-    output = dist.freeze(**freeze_opts)
+    cmd = dist.freeze
 
-    if target and target.lower().endswith('.zip'):
-        dist.zip(**others_opts)
+    return cmd(**options)
+
+
+def syncup(**options):
+    dist = options.pop('dist', None)
+    if dist is None:
+        meta = options.pop('meta', None)
+        path = options.pop('path', None)
+        name = options.pop('name', None)
+        version = options.pop('version', None)
+        if meta:
+            dist = get_dist_from_meta(meta)
+        elif path:
+            dist = get_dist_from_path(path)
+        else:
+            dist = get_dist_from_name(name, version)
+
+    try:
+        dist.dist_cache['freeze_lib']
+        dist.dist_cache['freeze_data']
+        dist.dist_cache['freeze_script']
+    except KeyError:
+        dist.freeze()
+
+    target = options['target']
+    if target.lower().endswith('.zip'):
+        cmd= dist.zip
     else:
-        dist.clone(**others_opts)
+        cmd = dist.clone
 
-    return os.path.exists(target)
+    return cmd(**options)
