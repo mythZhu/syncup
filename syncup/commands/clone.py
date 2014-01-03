@@ -25,7 +25,8 @@ class clone(Command):
 
         for (name, full, root, prefix) in cached_lib:
             dst_prefix = self.lib_prefix or real_prefix(prefix)
-            dst_full = os.path.join(dst_prefix, name)
+            dst_base = os.path.basename(full)
+            dst_full = os.path.join(dst_prefix, dst_base)
             dst_full = change_root(self.target, dst_full)
 
             copy_file_or_dir(full, dst_full, ignores=('*.pyc', '*.pyo'))
@@ -37,7 +38,8 @@ class clone(Command):
 
         for (name, full, root, prefix) in cached_dat:
             dst_prefix = self.lib_prefix or real_prefix(prefix)
-            dst_full = os.path.join(dst_prefix, name)
+            dst_base = os.path.basename(full)
+            dst_full = os.path.join(dst_prefix, dst_base)
             dst_full = change_root(self.target, dst_full)
 
             copy_file_or_dir(full, dst_full)
@@ -49,8 +51,8 @@ class clone(Command):
 
         for (name, full, root, prefix) in cached_bin:
             dst_prefix = self.lib_prefix or real_prefix(prefix)
-            dst_full = os.path.join(dst_prefix, name)
-            dst_full = os.path.join(dst_prefix, name)
+            dst_base = os.path.basename(full)
+            dst_full = os.path.join(dst_prefix, dst_base)
             dst_full = change_root(self.target, dst_full)
 
             copy_file_or_dir(full, dst_full)
