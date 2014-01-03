@@ -12,9 +12,8 @@ how to use
 
 A python distribution usually consists of packages, modules, scripts and
 addation data. If you want `syncup` to collect a python distribuiton,
-you MUST supply a metadata file for it.
-
-The following is the metadata file for `pip-1.3.1`:
+you MUST supply a metadata file for it. It's simple, it is just a common
+python file. The following is the metadata file for `pip-1.3.1`:
 
 ```
 dist_name = 'pip'
@@ -24,12 +23,12 @@ scripts = ['pip', 'pip-python', 'python-pip']
 data = ['share/doc/python-pip-1.3.1']
 ```
 
-look, it is just a common python file.
+*NOTE*:
+If you tired to supply the path of metadata file to `syncup` explicitly,
+you just put it under the path `syncup/metata` and name it `[name]-[version].py`.
 
-NOTE: If you tired to supply the path of metadata file to `syncup`
-explicitly, you just put it under the path `syncup/metata` and name it
-`[name]-[version].py`.
 
+*****
 
 Then, you can call `syncup` functions to manage a python distribution:
 
