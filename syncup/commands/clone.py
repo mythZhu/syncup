@@ -4,7 +4,7 @@ import os
 import tempfile
 
 from syncup.cmd import Command
-from syncup.util import walk_tree, change_root
+from syncup.util import walk_tree, change_root, real_prefix
 from syncup.util import copy_file_or_dir, remove_file_or_dir
 from syncup.errors import CommandError
 
@@ -24,7 +24,7 @@ class clone(Command):
             raise CommandError, 'please run freeze_lib command before.'
 
         for (name, full, root, prefix) in cached_lib:
-            dst_prefix = self.lib_prefix or prefix
+            dst_prefix = self.lib_prefix or real_prefix(prefix)
             dst_full = os.path.join(dst_prefix, name)
             dst_full = change_root(self.target, dst_full)
 
@@ -36,7 +36,7 @@ class clone(Command):
             raise CommandError, 'please run freeze_data command before.'
 
         for (name, full, root, prefix) in cached_dat:
-            dst_prefix = self.data_prefix or prefix
+            dst_prefix = self.lib_prefix or real_prefix(prefix)
             dst_full = os.path.join(dst_prefix, name)
             dst_full = change_root(self.target, dst_full)
 
@@ -48,7 +48,8 @@ class clone(Command):
             raise CommandError, 'please run freeze_script command before.'
 
         for (name, full, root, prefix) in cached_bin:
-            dst_prefix = self.script_prefix or prefix
+            dst_prefix = self.lib_prefix or real_prefix(prefix)
+            dst_full = os.path.join(dst_prefix, name)
             dst_full = os.path.join(dst_prefix, name)
             dst_full = change_root(self.target, dst_full)
 

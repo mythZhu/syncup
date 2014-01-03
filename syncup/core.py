@@ -69,9 +69,9 @@ def freeze(**options):
         else:
             dist = get_dist_from_name(name, version)
 
-    cmd = dist.freeze
+    output = dist.freeze(**options)
 
-    return cmd(**options)
+    return [ path for (_, path, __, ___) in output ]
 
 
 def syncup(**options):

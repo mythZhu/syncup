@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import sys
 import glob
 import shutil
 
@@ -69,3 +70,10 @@ def walk_tree(top):
             nodes.append(os.path.join(dirpath, filename))
 
     return nodes
+
+
+def real_prefix(prefix):
+    if hasattr(sys, 'real_prefix') and prefix.find(sys.prefix) == 0:
+        prefix = prefix[len(sys.prefix):]
+        prefix = os.path.join(sys.real_prefix, prefix)
+    return prefix

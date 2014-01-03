@@ -35,7 +35,7 @@ class Command(object):
         if not hasattr(self, 'user_options'):
             return
 
-        header = 'Command options for %s:' % self.__class__.__name__
+        header = indent + 'Command options for %s:' % self.__class__.__name__
         indent = indent + '  '
 
         lines = [header]
@@ -48,7 +48,7 @@ class Command(object):
         if not hasattr(self, 'output'):
             return
 
-        header = 'Command output for %s:' % self.__class__.__name__
+        header = indent + 'Command output for %s:' % self.__class__.__name__
         indent = indent + '  '
 
         lines = [header]
@@ -65,13 +65,13 @@ class Command(object):
         self.parse_options(options)
 
         if DEBUG:
-            self.dump_options(indent='  ')
+            self.dump_options()
 
         self.output = self.main()
         self.distribution.dist_cache[self.__class__.__name__] = self.output
 
         if DEBUG:
-            self.dump_output(indent='  ')
+            self.dump_output()
 
         return self.output
 

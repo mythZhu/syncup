@@ -84,6 +84,7 @@ syncup(name=name, version=version, target)
 
 # more, you can specify paths prefix for syncup()
 # it will store dist files with them
+# 'nopyc' indicates no compliled python files are copied
 syncup(
     dist=dist,
     target=target,
