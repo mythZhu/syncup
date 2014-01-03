@@ -44,6 +44,13 @@ class Distribution(object):
         # have been created by an dist commands run so far.
         self.dist_cache = {}
 
+    def __getattr__(self, name):
+        try:
+            return self.get_command_obj(name).run
+        except:
+            raise AttributeError, \
+                  "'%s' object has no attribute '%s'" % (self.__class__, name)
+
     def get_command_obj(self, command):
         from syncup import commands
         try:

@@ -75,7 +75,7 @@ def syncup(dist, target, **options):
             raise TypeError, \
                   'syncup() got an unexpected keyword argument %s' % key
 
-    output = dist.run_command('freeze', **freeze_opts)
+    output = dist.freeze(**freeze_opts)
 
     if DEBUG:
         print >> sys.stdout, 'D: freeze %s distribution files' % len(output)
@@ -83,9 +83,9 @@ def syncup(dist, target, **options):
             print >> sys.stdout, 'D: include %s' % full
 
     if target and target.lower().endswith('.zip'):
-        dist.run_command('zip', **others_opts)
+        dist.zip(**others_opts)
     else:
-        dist.run_command('clone', **others_opts)
+        dist.clone(**others_opts)
 
     if DEBUG:
         print >> sys.stdout, 'D: clone distribution to %s' % target

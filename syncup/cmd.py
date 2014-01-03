@@ -2,6 +2,7 @@
 
 from syncup.dist import Distribution
 from syncup.errors import CommandError
+from syncup.debug import DEBUG
 
 
 class Command(object):
